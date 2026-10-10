@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Internship board with search, filters and an application form.">
+  <title>Internship Board | Secure Application</title>
+  <style>
+    * { box-sizing: border-box; }
+:root { --ink: #25243a; --muted: #6d6b80; --purple: #6558d3; --line: #e8e6f2; }
+body { margin: 0; font-family: Arial, sans-serif; color: var(--ink); background: #f7f6ff; line-height: 1.55; }
+.container { width: min(1080px, 92%); margin: 0 auto; }
+.hero { padding: 48px 0 56px; color: white; background: linear-gradient(120deg, #6558d3, #a087ee); }
+.hero h1 { max-width: 760px; margin: 8px 0 12px; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; }
+.hero p { margin-top: 0; }
+.eyebrow { margin: 0 0 6px; color: #a69cf5; font-size: .75rem; font-weight: 800; letter-spacing: .13em; }
+.hero .eyebrow { color: #e7e1ff; }
+main { padding: 28px 0 50px; }
+.panel { margin-bottom: 24px; padding: clamp(18px, 3vw, 30px); border: 1px solid var(--line); border-radius: 20px; background: white; box-shadow: 0 10px 30px #3024770a; }
+h2 { margin: 0 0 8px; font-size: 1.6rem; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 20px; }
+.count, .tag { padding: 6px 10px; border-radius: 999px; background: #f0edff; color: #5c4bc4; font-size: .82rem; font-weight: 700; }
+.filters { display: grid; grid-template-columns: 2fr 1fr auto auto; align-items: end; gap: 12px; margin-bottom: 20px; }
+.field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 15px; }
+.filters .field { margin: 0; }
+label { font-size: .9rem; font-weight: 700; }
+input, select, textarea { width: 100%; padding: 12px; border: 1px solid #d8d7e6; border-radius: 10px; color: var(--ink); background: white; font: inherit; }
+textarea { resize: vertical; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 3px solid #f4b942; outline-offset: 2px; }
+.button { padding: 12px 16px; border: 0; border-radius: 10px; background: var(--purple); color: white; font: inherit; font-weight: 700; cursor: pointer; }
+.button:hover { filter: brightness(.95); }
+.button:disabled { opacity: .45; cursor: not-allowed; }
+.secondary { background: #efedff; color: #4e45a4; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; }
+.card { display: flex; flex-direction: column; min-width: 0; padding: 19px; border: 1px solid var(--line); border-radius: 15px; background: white; }
+.card h3 { color: #40358f; font-size: 1.08rem; }
+.company { margin: 0 0 10px; color: #7468cb; font-weight: 700; }
+.description { flex: 1; color: var(--muted); }
+.meta { color: var(--muted); font-size: .83rem; }
+.card .button { width: 100%; margin-top: 8px; }
+.empty, .notice { margin: 16px 0; padding: 16px; border-radius: 12px; background: #f4f2ff; }
+.empty { text-align: center; }
+.error { border: 1px solid #ffd1d8; background: #fff0f2; color: #a32236; }
+.form-panel { max-width: 720px; margin-right: auto; margin-left: auto; }
+.form-panel form { margin-top: 22px; }
+.full { width: 100%; }
+.muted, small, .demo-note { color: var(--muted); }
+small { font-size: .8rem; }
+.demo-note { margin-top: 18px; font-size: .85rem; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 24px; }
+footer { padding: 24px 12px; color: var(--muted); text-align: center; font-size: .9rem; }
+[hidden] { display: none !important; }
+@media (max-width: 820px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .filters { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 540px) { .cards, .filters { grid-template-columns: 1fr; } .section-heading { align-items: flex-start; flex-direction: column; } .pagination { gap: 8px; flex-wrap: wrap; } .hero { padding: 38px 0 44px; } }
+
+  </style>
+  
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <p class="eyebrow">YOUR NEXT CHAPTER STARTS HERE</p>
+      <h1>Find an internship you’ll love ✨</h1>
+      <p>Explore opportunities and send a demo application.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel" aria-labelledby="list-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">EXPLORE</p><h2 id="list-heading">Internship opportunities</h2></div>
+        <span class="count" id="resultCount" aria-live="polite">Loading…</span>
+      </div>
+
+      <form id="filterForm" class="filters">
+        <div class="field">
+          <label for="searchInput">Search by title, company, or domain</label>
+          <input id="searchInput" type="search" maxlength="80" placeholder="Try Java or Web Development">
+        </div>
+        <div class="field">
+          <label for="domainFilter">Choose a domain</label>
+          <select id="domainFilter">
+            <option value="all">All domains</option>
+            <option value="Java">Java</option>
+            <option value="Python">Python</option>
+            <option value="AI & ML">AI &amp; ML</option>
+            <option value="Web Development">Web Development</option>
+            <option value="Data Science">Data Science</option>
+          </select>
+        </div>
+        <button class="button" type="submit">Search</button>
+        <button class="button secondary" id="clearButton" type="button">Clear</button>
+      </form>
+
+      <p id="loadingMessage" class="notice" role="status" hidden>Loading internships…</p>
+      <p id="errorMessage" class="notice error" role="alert" hidden></p>
+      <div id="internshipList" class="cards" aria-live="polite"></div>
+      <div id="emptyMessage" class="empty" hidden>
+        <h3>No internships found</h3>
+        <p>Try another keyword or choose All domains.</p>
+      </div>
+      <div class="pagination">
+        <button class="button secondary" id="previousButton" type="button" disabled>← Previous</button>
+        <span id="pageInfo">Page 1</span>
+        <button class="button secondary" id="nextButton" type="button" disabled>Next →</button>
+      </div>
+    </section>
+
+    <section class="panel form-panel" aria-labelledby="apply-heading">
+      <p class="eyebrow">TAKE THE NEXT STEP</p>
+      <h2 id="apply-heading">Application form</h2>
+      <p class="muted">Select an internship above or choose one below.</p>
+      <form id="applicationForm" novalidate>
+        <div class="field">
+          <label for="fullName">Full name</label>
+          <input id="fullName" name="fullName" type="text" minlength="2" maxlength="60"
+                 pattern="[A-Za-z .'-]+" autocomplete="name" required placeholder="Enter your name">
+          <small>Use 2–60 letters, spaces, apostrophes, dots or hyphens.</small>
+        </div>
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" maxlength="120" autocomplete="email"
+                 required placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="internshipChoice">Internship</label>
+          <select id="internshipChoice" name="internshipChoice" required>
+            <option value="">Select an internship</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="message">Short message (optional)</label>
+          <textarea id="message" name="message" rows="4" maxlength="500"
+                    placeholder="Why are you interested?"></textarea>
+          <small>Maximum 500 characters.</small>
+        </div>
+        <button class="button full" id="submitButton" type="submit">Submit application</button>
+      </form>
+      <p id="formMessage" class="notice" role="status" hidden></p>
+      <p class="demo-note">Demo note: this static version validates in your browser. It does not send data to a real server or save applications permanently.</p>
+    </section>
+  </main>
+
+  <footer><p>Built with HTML, CSS and JavaScript · Task 4 demo</p></footer>
+<script src="script.js" defer></script>
+</body>
+</html>
